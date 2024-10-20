@@ -59,7 +59,7 @@ int[][] RandomNumbers() {
         boolean placed = false;
         while (!placed) {
           num = (int) random(1, 10);
-          if (CheckRow(puzzle, num, i)) {
+          if (CheckRow(puzzle, num, i) && CheckCol(puzzle, num, j)) {
             puzzle[i][j] = num;
             placed = true;
           }
@@ -74,6 +74,16 @@ int[][] RandomNumbers() {
 boolean CheckRow(int[][] puzzle, int a, int row) {
   for (int i = 0; i < 9; i++) {
     if (puzzle[row][i] == a) {
+      return false; 
+    }
+  }
+  return true; 
+}
+
+
+boolean CheckCol(int[][] puzzle, int a, int col) {
+  for (int i = 0; i < 9; i++) {
+    if (puzzle[i][col] == a) {
       return false; 
     }
   }
