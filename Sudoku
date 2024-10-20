@@ -3,6 +3,7 @@ int selectedRow = -1;
 int selectedCol = -1;
 boolean selected = false;
 boolean[][] editable = new boolean[9][9]; 
+boolean victory = false;
 
 
 void setup() {
@@ -18,7 +19,11 @@ void draw() {
   draw_grid(3, width);
   Selection();
   DrawNumbers();
-}
+  if (victory) {
+    displayVictoryScreen(); 
+  }
+}  
+
 
 
 void Selection(){
@@ -88,29 +93,34 @@ boolean fillBoard() {
 
 
 boolean isValid(int row, int col, int num) {
-  return CheckRow(board, num, row) && CheckCol(board, num, col) && CheckBlock(board, num, row, col);
+  boolean rowCheck = CheckRow(board, num, row, col);
+  boolean colCheck = CheckCol(board, num, col, row);
+  boolean blockCheck = CheckBlock(board, num, row, col);
+  return rowCheck && colCheck && blockCheck;
 }
 
 
-boolean CheckRow(int[][] puzzle, int num, int row) {
+boolean CheckRow(int[][] puzzle, int num, int row, int col) {
   for (int i = 0; i < 9; i++) {
     if (puzzle[row][i] == num) {
+      if (i != col){ 
       return false;
+      }
     }
   }
-  return true;
+  return true; 
 }
 
-
-boolean CheckCol(int[][] puzzle, int num, int col) {
+boolean CheckCol(int[][] puzzle, int num, int col, int row) {
   for (int i = 0; i < 9; i++) {
     if (puzzle[i][col] == num) {
+      if (i != row){ 
       return false;
+      }
     }
   }
-  return true;
+  return true; 
 }
-
 
 boolean CheckBlock(int[][] puzzle, int num, int row, int col) {
   int startRow = (row / 3) * 3;
@@ -118,16 +128,18 @@ boolean CheckBlock(int[][] puzzle, int num, int row, int col) {
   for (int i = startRow; i < startRow + 3; i++) {
     for (int j = startCol; j < startCol + 3; j++) {
       if (puzzle[i][j] == num) {
-        return false;
+        if (i != row && j != col){
+        return false; 
+        }
       }
     }
   }
-  return true;
+  return true; 
 }
 
 
 void removeNumbers() {
-  int count = 40; 
+  int count = 2; 
   while (count != 0) {
     int i = (int) random(9);
     int j = (int) random(9);
@@ -176,7 +188,7 @@ boolean fillBoard(int[][] puzzle) {  // Copy solver
 }
 
 boolean isValid(int row, int col, int num, int[][] puzzle) {
-  return CheckRow(puzzle, num, row) && CheckCol(puzzle, num, col) && CheckBlock(puzzle, num, row, col);
+  return CheckRow(puzzle, num, row, col) && CheckCol(puzzle, num, col, row) && CheckBlock(puzzle, num, row, col);
 }
 
 void printBoard() {
@@ -204,9 +216,41 @@ void keyPressed() {
   if (selectedRow != -1 && selectedCol != -1) {
     if (key >= '1' && key <= '9') {
       board[selectedRow][selectedCol] = Character.getNumericValue(key);
+      checkVictory(); 
     } 
     else if (keyCode == BACKSPACE) {
       board[selectedRow][selectedCol] = 0;
     }
   }
+}
+
+
+void checkVictory() {
+  for (int row = 0; row < 9; row++) {
+    for (int col = 0; col < 9; col++) {
+      if (board[row][col] == 0) {
+        println("Cell empty at (" + row + ", " + col + ")");
+        return;
+      }
+      if (!isValid(row, col, board[row][col])) {
+        println("Invalid number at (" + row + ", " + col + ")");
+        return;
+      }
+    }
+  }
+  victory = true; 
+  println("Victory!");
+}
+
+
+void displayVictoryScreen() {
+  fill(0, 150); 
+  rect(0, 0, width, height); 
+
+  fill(255); 
+  textSize(48);
+  textAlign(CENTER, CENTER);
+  text("Congratulations!", width / 2, height / 3);
+  textSize(32);
+  text("You solved the Sudoku!", width / 2, height / 2);
 }
