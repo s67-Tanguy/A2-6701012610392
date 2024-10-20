@@ -1,9 +1,21 @@
+int[][] board;//position in board
+
 void setup() {
     size(500, 500);
     background(255);
-    draw_grid(4,width);
+    draw_grid(3,width);
+    board = RandomNumbers();
+    int i = 0;
+    while (i < 9){
+      int j = 0;
+      while (j < 9){
+        print(board[i][j],"");
+        j++;
+      }
+      print("\n");
+      i++;
+    }
 }    
-
 
 void draw_grid(int a,int size){
     int i = 1;
@@ -20,4 +32,21 @@ void draw_grid(int a,int size){
       line(0,size/a*j,size,size/a*j);
       j++;
     }
+}
+
+
+int[][] RandomNumbers() {
+  int[][] puzzle = new int[9][9];
+  int i = 0;
+    while (i < 9){
+      int j = 0;
+      while (j < 9){
+        if (random(1) > 0.5) {
+          puzzle[i][j] = (int) random(1, 10);
+          }
+        j++;  
+      }
+    i++;
+  }
+  return puzzle;
 }
