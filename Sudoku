@@ -1,46 +1,33 @@
-int[][] board; // position in board
+int[][] board = new int[9][9]; // The Sudoku board
 int selectedRow = -1;
 int selectedCol = -1;
 boolean selected = false;
-boolean[][] editable;
+boolean[][] editable = new boolean[9][9]; 
 
 
 void setup() {
   size(540, 540);
   background(255);
-  
-  board = RandomNumbers();
-  for (int i = 0; i < 9; i++) {
-    for (int j = 0; j < 9; j++) {
-      print(board[i][j], "");
-    }
-    print("\n");
-    
-  editable = new boolean[9][9];
-  int k = 0;
-  while (k < 9){
-    int l = 0;
-    while (l < 9){
-      editable[k][l] = (board[k][l] == 0);
-      l++;
-      }
-    k++;
-    }
-  }
-}    
-
+  generateSudoku();
+  printBoard();
+}
 
 
 void draw() {
   background(255);
   draw_grid(3, width);
-  if (selected){
+  Selection();
+  DrawNumbers();
+}
+
+
+void Selection(){
+if (selected){
     stroke(0,0,255);
     strokeWeight(2);
     fill(230);
     rect((width/9)*selectedCol,(height/9)*selectedRow,(width/9),(height/9));
   }
-  DrawNumbers();
 }
 
 
@@ -50,7 +37,7 @@ void draw_grid(int a, int size) {
     strokeWeight(1);
     line(size / a * i / 3, 0, size / a * i / 3, size);
     line(0, size / a * i / 3, size, size / a * i / 3);
-  }  
+  }
   for (int j = 1; j < a; j++) {
     strokeWeight(4);
     line(size / a * j, 0, size / a * j, size);
@@ -63,7 +50,7 @@ void DrawNumbers() {
   textSize(32);
   for (int i = 0; i < 9; i++) {
     for (int j = 0; j < 9; j++) {
-      if (board[i][j] != 0) { // 0 is a blank
+      if (board[i][j] != 0) {
         fill(0);
         textAlign(CENTER, CENTER);
         text(board[i][j], j * height / 9 + height / 18, i * height / 9 + height / 18);
@@ -73,58 +60,132 @@ void DrawNumbers() {
 }
 
 
-int[][] RandomNumbers() {
-  int[][] puzzle = new int[9][9];
-  for (int i = 0; i < 9; i++) {
-    for (int j = 0; j < 9; j++) {
-      if (random(1) > 0.5) {
-        int num;
-        boolean placed = false;
-        while (!placed) {
-          num = (int) random(1, 10);
-          if (CheckRow(puzzle, num, i) && CheckCol(puzzle, num, j) && CheckBlock(puzzle, num, i, j)) {
-            puzzle[i][j] = num;
-            placed = true;
+void generateSudoku() {
+  fillBoard();
+  removeNumbers();
+}
+
+
+boolean fillBoard() {
+  for (int row = 0; row < 9; row++) {
+    for (int col = 0; col < 9; col++) {
+      if (board[row][col] == 0) {
+        for (int num = 1; num <= 9; num++) {
+          if (isValid(row, col, num)) {
+            board[row][col] = num;
+            if (fillBoard()) {
+              return true;
+            }
+            board[row][col] = 0; 
           }
         }
-      }
-    }
-  }
-  return puzzle;
-}
-
-
-boolean CheckRow(int[][] puzzle, int a, int row) {
-  for (int i = 0; i < 9; i++) {
-    if (puzzle[row][i] == a) {
-      return false; 
-    }
-  }
-  return true; 
-}
-
-
-boolean CheckCol(int[][] puzzle, int a, int col) {
-  for (int i = 0; i < 9; i++) {
-    if (puzzle[i][col] == a) {
-      return false; 
-    }
-  }
-  return true; 
-}
-
-
-boolean CheckBlock(int[][] puzzle, int a, int row, int col) {
-  int startRow = (row / 3) * 3;
-  int startCol = (col / 3) * 3;
-  for (int i = startRow; i < startRow + 3; i++) {
-    for (int j = startCol; j < startCol + 3; j++) {
-      if (puzzle[i][j] == a) {
         return false; 
       }
     }
   }
   return true; 
+}
+
+
+boolean isValid(int row, int col, int num) {
+  return CheckRow(board, num, row) && CheckCol(board, num, col) && CheckBlock(board, num, row, col);
+}
+
+
+boolean CheckRow(int[][] puzzle, int num, int row) {
+  for (int i = 0; i < 9; i++) {
+    if (puzzle[row][i] == num) {
+      return false;
+    }
+  }
+  return true;
+}
+
+
+boolean CheckCol(int[][] puzzle, int num, int col) {
+  for (int i = 0; i < 9; i++) {
+    if (puzzle[i][col] == num) {
+      return false;
+    }
+  }
+  return true;
+}
+
+
+boolean CheckBlock(int[][] puzzle, int num, int row, int col) {
+  int startRow = (row / 3) * 3;
+  int startCol = (col / 3) * 3;
+  for (int i = startRow; i < startRow + 3; i++) {
+    for (int j = startCol; j < startCol + 3; j++) {
+      if (puzzle[i][j] == num) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+
+void removeNumbers() {
+  int count = 40; 
+  while (count != 0) {
+    int i = (int) random(9);
+    int j = (int) random(9);
+    if (board[i][j] != 0) {
+      int temp = board[i][j];
+      board[i][j] = 0;
+      if (!isSolvable()) {
+        board[i][j] = temp; 
+      } 
+      else {
+        editable[i][j] = true; 
+        count--;
+      }
+    }
+  }
+}
+
+
+boolean isSolvable() {
+  int[][] copy = new int[9][9];   // Create a copy of the board to solve
+  for (int i = 0; i < 9; i++) {
+    System.arraycopy(board[i], 0, copy[i], 0, 9);
+  }
+  return fillBoard(copy);
+}
+
+
+boolean fillBoard(int[][] puzzle) {  // Copy solver
+  for (int row = 0; row < 9; row++) {
+    for (int col = 0; col < 9; col++) {
+      if (puzzle[row][col] == 0) {
+        for (int num = 1; num <= 9; num++) {
+          if (isValid(row, col, num, puzzle)) {
+            puzzle[row][col] = num;
+            if (fillBoard(puzzle)) {
+              return true;
+            }
+            puzzle[row][col] = 0; 
+          }
+        }
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+boolean isValid(int row, int col, int num, int[][] puzzle) {
+  return CheckRow(puzzle, num, row) && CheckCol(puzzle, num, col) && CheckBlock(puzzle, num, row, col);
+}
+
+void printBoard() {
+  for (int i = 0; i < 9; i++) {
+    for (int j = 0; j < 9; j++) {
+      print(board[i][j], "");
+    }
+    print("\n");
+  }
 }
 
 
