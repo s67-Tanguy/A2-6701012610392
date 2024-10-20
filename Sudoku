@@ -75,7 +75,8 @@ boolean fillBoard() {
   for (int row = 0; row < 9; row++) {
     for (int col = 0; col < 9; col++) {
       if (board[row][col] == 0) {
-        for (int num = 1; num <= 9; num++) {
+        for (int i = 0; i < 9; i++) {
+          int num = (int) random(1,10);
           if (isValid(row, col, num)) {
             board[row][col] = num;
             if (fillBoard()) {
@@ -140,17 +141,18 @@ boolean CheckBlock(int[][] puzzle, int num, int row, int col) {
 
 void removeNumbers() {
   int count = 2; 
-  while (count != 0) {
+  while (count > 0) {
     int i = (int) random(9);
     int j = (int) random(9);
     if (board[i][j] != 0) {
       int temp = board[i][j];
       board[i][j] = 0;
+      
       if (!isSolvable()) {
-        board[i][j] = temp; 
+        board[i][j] = temp;
       } 
       else {
-        editable[i][j] = true; 
+        editable[i][j] = true;
         count--;
       }
     }
@@ -213,15 +215,24 @@ void mousePressed() {
 
 
 void keyPressed() {
-  if (selectedRow != -1 && selectedCol != -1) {
+  if (victory && key == 'r') {
+    resetGame();
+  } else if (selectedRow != -1 && selectedCol != -1) {
     if (key >= '1' && key <= '9') {
       board[selectedRow][selectedCol] = Character.getNumericValue(key);
-      checkVictory(); 
+      checkVictory();
     } 
     else if (keyCode == BACKSPACE) {
       board[selectedRow][selectedCol] = 0;
     }
   }
+}
+
+
+void resetGame() {
+  board = new int[9][9];
+  victory = false;
+  generateSudoku();
 }
 
 
