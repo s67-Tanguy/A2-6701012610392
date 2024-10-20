@@ -34,13 +34,13 @@ void setup() {
 void draw() {
   background(255);
   draw_grid(3, width);
-  DrawNumbers();
   if (selected){
     stroke(0,0,255);
     strokeWeight(2);
     fill(230);
     rect((width/9)*selectedCol,(height/9)*selectedRow,(width/9),(height/9));
   }
+  DrawNumbers();
 }
 
 
@@ -135,5 +135,17 @@ void mousePressed() {
     selectedRow = row;
     selectedCol = col;
     selected = true;
+  }
+}
+
+
+void keyPressed() {
+  if (selectedRow != -1 && selectedCol != -1) {
+    if (key >= '1' && key <= '9') {
+      board[selectedRow][selectedCol] = Character.getNumericValue(key);
+    } 
+    else if (keyCode == BACKSPACE) {
+      board[selectedRow][selectedCol] = 0;
+    }
   }
 }
