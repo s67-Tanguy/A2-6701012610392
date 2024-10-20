@@ -1,76 +1,93 @@
 int[][] board;//position in board
 
-void setup() {
-    size(500, 500);
-    background(255);
-    board = RandomNumbers();
-    
-    int i = 0;
-    while (i < 9){
-      int j = 0;
-      while (j < 9){
-        print(board[i][j],"");
-        j++;
-      }
-      print("\n");
-      i++;
-    }
-}    
 
+void setup() {
+  size(540, 540);
+  background(255);
+  board = RandomNumbers();
+  
+  int i = 0;
+  while (i < 9){
+    int j = 0;
+    while (j < 9){
+      print(board[i][j],"");
+      j++;
+    }
+    print("\n");
+    i++;
+  }
+}  
 
 void draw() {
-    background(255);
-    draw_grid(3,width);
-    DrawNumbers();
+  background(255);
+  draw_grid(3,width);
+  DrawNumbers();
 }
 
 
 void draw_grid(int a,int size){
-    int i = 1;
-    while (i < a*3){
-      strokeWeight(1);
-      line(size/a*i/3,0,size/a*i/3,size);
-      line(0,size/a*i/3,size,size/a*i/3);
-      i++;
-    }  
-    int j = 1;
-    while (j < a){
-      strokeWeight(4);
-      line(size/a*j,0,size/a*j,size);
-      line(0,size/a*j,size,size/a*j);
-      j++;
-    }
+  stroke(0);
+  int i = 1;
+  while (i < a*3){
+    strokeWeight(1);
+    line(size/a*i/3,0,size/a*i/3,size);
+    line(0,size/a*i/3,size,size/a*i/3);
+    i++;
+  }  
+  int j = 1;
+  while (j < a){
+    strokeWeight(4);
+    line(size/a*j,0,size/a*j,size);
+    line(0,size/a*j,size,size/a*j);
+    j++;
+  }
 }
 
 
 void DrawNumbers() {
-    textSize(32);
-    int i = 0;
-    while (i < 9){
-      int j = 0;
-      while (j < 9){
+  textSize(32);
+  int i = 0;
+  while (i < 9){
+    int j = 0;
+    while (j < 9){
+      if (board[i][j] != 0) { // 0 is a blank
         fill(0);
         textAlign(CENTER, CENTER);
         text(board[i][j], j*height/9 + height/9/2, i*height/9 + height/9/2);
-        j++;
-      }  
-      i++;
-    }
+      }
+      j++;
+    }  
+    i++;
+  }
 }
 
 
 int[][] RandomNumbers() {
   int[][] puzzle = new int[9][9];
-  int i = 0;
-    while (i < 9){
-      int j = 0;
-      while (j < 9){
-        if (random(1) > 0.5) {
-          puzzle[i][j] = (int) random(1, 10);
+  for (int i = 0; i < 9; i++) {
+    for (int j = 0; j < 9; j++) {
+      if (random(1) > 0.5) {
+        int num;
+        boolean placed = false;
+        while (!placed) {
+          num = (int) random(1, 10);
+          if (CheckRow(puzzle, num, i)) {
+            puzzle[i][j] = num;
+            placed = true;
           }
-        j++;  
+        }
       }
-    i++;
+    }
   }
   return puzzle;
+}
+
+
+boolean CheckRow(int[][] puzzle, int a, int row) {
+  for (int i = 0; i < 9; i++) {
+    if (puzzle[row][i] == a) {
+      return false; 
+    }
+  }
+  return true; 
 }
